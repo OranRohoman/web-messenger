@@ -17,7 +17,6 @@ const Login = (props) => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    console.log(event.target.username.value," ",event.target.password.value)
     const username = event.target.username.value;
     const password = event.target.password.value;
 

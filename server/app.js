@@ -25,7 +25,6 @@ app.use(express.static(join(__dirname, "public")));
 
 
 app.use(function (req, res, next) {
-  console.log(req.cookies.token);
   const token = req.cookies.token;
   if (token) {
     jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
