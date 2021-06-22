@@ -36,11 +36,36 @@ router.post("/", async (req, res, next) => {
       senderId,
       text,
       conversationId: conversation.id,
+      read:false,
     });
     res.json({ message, sender });
   } catch (error) {
     next(error);
   }
+});
+
+router.post("/read/:id", async (req, res, next) => {
+  try{
+    const { conversationId } = req.params;
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const messages = await User.findAll({
+      where: {
+        conversationId,
+      },
+    });
+    for( let i = 0; i<messages.length ; i++)
+    {
+      messages[i].read = true;
+      await jane.save({fields:['read']})
+    }
+    res.json({"response":"Updated messages in conversation: "+conversationId});
+
+  }catch (error) {
+    next(error);
+  }
+  
 });
 
 module.exports = router;

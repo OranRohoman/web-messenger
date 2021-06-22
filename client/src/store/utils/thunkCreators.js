@@ -109,3 +109,13 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const updateRead = (id) => async(dispatch) =>
+{
+  try { 
+    const {data} = await axios.get(`/api/messages/read/${id}`);
+    
+  } catch (error) {
+    console.error(error)
+  } 
+};

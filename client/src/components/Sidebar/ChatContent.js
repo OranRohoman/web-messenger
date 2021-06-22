@@ -39,7 +39,7 @@ const ChatContent = (props) => {
 
   const { conversation } = props;
   const { latestMessageText, otherUser } = conversation;
-
+  console.log(conversation);
   return (
     <Box className={classes.root}>
       <Box>
@@ -50,6 +50,9 @@ const ChatContent = (props) => {
           {latestMessageText}
         </Typography>
       </Box>
+      <Typography className={classes.notification}>
+          
+      </Typography>
     </Box>
   );
 };
