@@ -44,23 +44,24 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.post("/read/:id", async (req, res, next) => {
+router.post("/read", async (req, res, next) => {
   try{
-    const { conversationId } = req.params;
+    const { conversation,username } = req.body;
     if (!req.user) {
       return res.sendStatus(401);
-    }
-    const messages = await User.findAll({
+    }    
+    const messages = await Message.findAll({
       where: {
-        conversationId,
+        conversationId:conversation.id,
+        senderId:username,
       },
     });
     for( let i = 0; i<messages.length ; i++)
     {
       messages[i].read = true;
-      await jane.save({fields:['read']})
+      await messages[i].save({fields:['read']})
     }
-    res.json({"response":"Updated messages in conversation: "+conversationId});
+    res.json({...messages});
 
   }catch (error) {
     next(error);

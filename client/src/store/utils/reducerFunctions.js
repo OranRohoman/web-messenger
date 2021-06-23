@@ -3,7 +3,7 @@ export const addMessageToStore = (state, payload) => {
   // if sender isn't null, that means the message needs to be put in a brand new convo
   const user_id =  localStorage.getItem("user");
 
-  if (sender !== null && message.recipientId == user_id) {
+  if (sender !== null && message.recipientId === user_id) {
     const newConvo = {
       id: message.conversationId,
       otherUser: sender,
@@ -81,3 +81,20 @@ export const addNewConvoToStore = (state, recipientId, message) => {
     }
   });
 };
+
+export const updateRead = (state, conversation, username) => {
+  return state.map((convo) => {
+    if(convo.id === conversation.id) {
+      const newConvo = { ...convo}
+      newConvo.messages.forEach(element => {
+        if(element.senderId === username) {
+          element.read = true;
+        }
+      });
+      return newConvo;
+    }
+    else{
+      return convo;
+    }
+  });
+}
