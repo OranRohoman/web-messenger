@@ -116,10 +116,14 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
 export const setRead = (conversation,username) => async(dispatch) =>
 {
   try {
-    const credentials = {conversation,username}; 
-     await axios.post(`/api/messages/read/`,credentials).then(data =>{
-      dispatch(markRead(conversation,username));
-     });
+    //check if it isnt a new conversation
+    if(conversation.id != undefined)
+    {
+      const credentials = {conversation,username}; 
+      await axios.post(`/api/messages/read/`,credentials).then(data =>{
+        dispatch(markRead(conversation,username));
+      });
+    }
     
   } catch (error) {
     console.error(error)
