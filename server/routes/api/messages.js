@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
+const { Op } = require("sequelize");
 
 // expects {recipientId, text, conversationId } in body (conversationId will be null if no conversation exists yet)
 router.post("/", async (req, res, next) => {
@@ -17,8 +18,8 @@ router.post("/", async (req, res, next) => {
       let convPK = await Conversation.findByPk(conversationId);
       if(convPK.dataValues.user1Id == recipientId && convPK.dataValues.user2Id ==  senderId
         || convPK.dataValues.user1Id == senderId && convPK.dataValues.user2Id == recipientId ){
-
-          const message = await Message.create({ senderId, text, conversationId});
+          
+          const message = await Message.create({ senderId, text, conversationId, read:false});
           return res.json({ message, sender });
       }
       return res.sendStatus(401);
@@ -52,24 +53,32 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.post("/read", async (req, res, next) => {
+router.put("/read", async (req, res, next) => {
   try{
-    const { conversation,username } = req.body;
+    const { conversation,userId } = req.body;
     if (!req.user) {
       return res.sendStatus(401);
     }    
-    const messages = await Message.findAll({
-      where: {
-        conversationId:conversation.id,
-        senderId:username,
-      },
+ 
+    const conv = await Conversation.findOne({
+      where:{
+        [Op.or]: {
+          user1Id: req.user.id,
+          user2Id: req.user.id,
+        },
+      }
     });
-    for( let i = 0; i<messages.length ; i++)
+    if(conv !== null)
     {
-      messages[i].read = true;
-      await messages[i].save({fields:['read']})
+      await Message.update({read:true},{
+        where:{
+          conversationId:conversation.id,
+          senderId:userId,
+  
+        }
+      });
     }
-    res.json({...messages});
+    res.json(200);
 
   }catch (error) {
     next(error);

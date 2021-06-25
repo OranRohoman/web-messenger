@@ -1,15 +1,20 @@
 export const addMessageToStore = (state, payload) => {
   const { message, sender } = payload;
-  // if sender isn't null, that means the message needs to be put in a brand new convo
+  // this is a messy temporary fix for a problem that will be solved in ticket 4.
   const user_id =  localStorage.getItem("user");
+  
+  // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null && message.recipientId == user_id) {
     const newConvo = {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
+      
     };
-    
+    newConvo.lastTime = message.createdAt;
     newConvo.latestMessageText = message.text;
+    newConvo.totalUnread = 1;
+    // resort the conversations
     return [newConvo, ...state];
   }
 
@@ -18,7 +23,11 @@ export const addMessageToStore = (state, payload) => {
       const convoCopy = { ...convo };
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
-
+      convoCopy.lastTime = message.createdAt;
+      if(!convo.active )
+      {
+        convoCopy.totalUnread ++;
+      }
       return convoCopy;
     } else {
       return convo;
@@ -74,25 +83,31 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       newConvo.id = message.conversationId;
       newConvo.messages.push(message);
       newConvo.latestMessageText = message.text;
+      newConvo.active = true;
       return newConvo;
     } else {
+      convo.active = false;
       return convo;
     }
   });
 };
 
-export const updateRead = (state, conversation, username) => {
+export const updateRead = (state, conversation, userId) => {
   return state.map((convo) => {
     if(convo.id === conversation.id) {
       const newConvo = { ...convo}
+      newConvo.active = true;
+      let read_count = 0;
       newConvo.messages.forEach(element => {
-        if(element.senderId === username) {
+        if(element.senderId === userId) {
           element.read = true;
         }
       });
+      newConvo.totalUnread = 0;
       return newConvo;
     }
     else{
+      convo.active = false;
       return convo;
     }
   });

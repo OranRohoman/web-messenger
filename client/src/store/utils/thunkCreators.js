@@ -112,16 +112,16 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const setRead = (conversation,username) => async(dispatch) =>
+export const setRead = (conversation,userId) => async(dispatch) =>
 {
   try {
     //check if it isnt a new conversation
     if(conversation.id != undefined)
     {
-      const credentials = {conversation,username}; 
-      await axios.post(`/api/messages/read/`,credentials).then(data =>{
-        dispatch(markRead(conversation,username));
-      });
+      const credentials = {conversation,userId}; 
+      await axios.put(`/api/messages/read/`,credentials);
+      dispatch(markRead(conversation,userId));
+      
     }
     
   } catch (error) {
