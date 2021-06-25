@@ -29,13 +29,6 @@ class Chat extends Component {
   render() {
     const { classes } = this.props;
     const otherUser = this.props.conversation.otherUser;
-    var unreadCount  = 0;
-    this.props.conversation.messages.forEach(element => {
-      if(!element.read && element.senderId === otherUser.id)
-      {
-        unreadCount++;
-      }
-    });
     return (
       <Box
         onClick={() => this.handleClick(this.props.conversation)}
@@ -47,7 +40,7 @@ class Chat extends Component {
           online={otherUser.online}
           sidebar={true}
         />
-        <ChatContent conversation={this.props.conversation} unreadCount={unreadCount}/>
+        <ChatContent conversation={this.props.conversation} unreadCount={this.props.conversation.totalUnread}/>
       </Box>
     );
   }

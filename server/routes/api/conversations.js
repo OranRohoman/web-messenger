@@ -71,8 +71,15 @@ router.get("/", async (req, res, next) => {
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length -1].text;
       //new field to sort by so conversations in the side bar are still ordered.
-      convoJSON.lastTime = convoJSON.messages[convoJSON.messages.length -1].createdAt;
       
+      convoJSON.lastTime = convoJSON.messages[convoJSON.messages.length -1].createdAt;
+      let count = 0;
+      convoJSON.messages.forEach(element => {
+        if(element.read == false && element.senderId != req.user.id){
+          count++;
+        }
+      });      
+      convoJSON.totalUnread = count;
       conversations[i] = convoJSON;
     }
     

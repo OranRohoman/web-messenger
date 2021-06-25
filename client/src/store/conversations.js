@@ -69,10 +69,10 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const markRead = (conversation,user_id) => {
+export const markRead = (conversation,userId) => {
   return {
     type: MARK_READ,
-    payload: { conversation, user_id},
+    payload: { conversation, userId},
   }
 }
 
@@ -105,7 +105,7 @@ const reducer = (state = [], action) => {
       return updateRead(
         state,
         action.payload.conversation,
-        action.payload.user_id
+        action.payload.userId
       )
     default:
       return state;
