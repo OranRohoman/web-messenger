@@ -1,12 +1,15 @@
 export const addMessageToStore = (state, payload) => {
   const { message, sender } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
-  if (sender !== null) {
+  const user_id =  localStorage.getItem("user");
+
+  if (sender !== null && user_id == message.recipientId) {
     const newConvo = {
       id: message.conversationId,
       otherUser: sender,
       messages: [message],
     };
+    
     newConvo.latestMessageText = message.text;
     return [newConvo, ...state];
   }
@@ -50,12 +53,10 @@ export const removeOfflineUserFromStore = (state, id) => {
 
 export const addSearchedUsersToStore = (state, users) => {
   const currentUsers = {};
-
   // make table of current users so we can lookup faster
   state.forEach((convo) => {
     currentUsers[convo.otherUser.id] = true;
   });
-
   const newState = [...state];
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
@@ -64,7 +65,6 @@ export const addSearchedUsersToStore = (state, users) => {
       newState.push(fakeConvo);
     }
   });
-
   return newState;
 };
 
