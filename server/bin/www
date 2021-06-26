@@ -31,7 +31,6 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces, and sync database.
  */
 
-
 const io = require("socket.io")(server);
 
 //middleware detects if the header cookie is valid before continuing socket operation.
