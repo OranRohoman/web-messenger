@@ -74,11 +74,17 @@ router.get("/", async (req, res, next) => {
       
       convoJSON.lastTime = convoJSON.messages[convoJSON.messages.length -1].createdAt;
       let count = 0;
+      convoJSON.lastread = "";
       convoJSON.messages.forEach(element => {
-        if(element.read == false && element.senderId != req.user.id){
+        if(element.senderId != req.user.id && !element.read){
           count++;
         }
-      });      
+        else if(element.senderId === req.user.id && element.read){
+          convoJSON.lastread = element;
+        }
+
+      });
+            
       convoJSON.totalUnread = count;
       conversations[i] = convoJSON;
     }

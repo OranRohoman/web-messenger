@@ -5,6 +5,7 @@ import {
   removeOfflineUserFromStore,
   addMessageToStore,
   updateRead,
+  foreignRead,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -17,6 +18,8 @@ const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
 const MARK_READ = "MARK_READ";
+const FOREIGN_READ = "FOREIGN_READ";
+
 
 // ACTION CREATORS
 
@@ -76,6 +79,13 @@ export const markRead = (conversation,userId) => {
   }
 }
 
+export const foreRead = (conversation) => {
+  return {
+    type:FOREIGN_READ,
+    payload:{conversation},
+  }
+}
+
 
 // REDUCER
 
@@ -106,6 +116,11 @@ const reducer = (state = [], action) => {
         state,
         action.payload.conversation,
         action.payload.userId
+      )
+    case FOREIGN_READ:
+      return foreignRead(
+        state,
+        action.payload.conversation
       )
     default:
       return state;

@@ -12,7 +12,7 @@ const Messages = (props) => {
   // that is from a different user and hasnt been read before.  
   if(messages.length > 0)
   {
-    if(messages[messages.length -1].senderId != userId && !messages[messages.length -1].read)
+    if(messages[messages.length -1].senderId !== userId && !messages[messages.length -1].read)
     {
       // probably a little messy to call the same dispatch twice.
       props.setRead(conversation,otherUser.id);
@@ -24,9 +24,9 @@ const Messages = (props) => {
         const time = moment(message.createdAt).format("h:mm");
 
         return message.senderId === userId ? (
-          <SenderBubble key={message.id} text={message.text} time={time} />
+          <SenderBubble key={message.id} text={message.text} time={time} otherUser={otherUser} lastread={conversation.lastread} id={message.id}/>
         ) : (
-          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />
+          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser}/>
         );
       })}
     </Box>

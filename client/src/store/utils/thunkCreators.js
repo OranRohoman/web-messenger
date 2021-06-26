@@ -116,15 +116,22 @@ export const setRead = (conversation,userId) => async(dispatch) =>
 {
   try {
     //check if it isnt a new conversation
-    if(conversation.id != undefined)
+    if(conversation.id !== undefined)
     {
-      const credentials = {conversation,userId}; 
-      await axios.put(`/api/messages/read/`,credentials);
+      const credentials = {conversation,userId};
+      const messages = await axios.put(`/api/messages/read/`,credentials);
       dispatch(markRead(conversation,userId));
-      
+      communicateRead(conversation.id,messages.data)
     }
     
   } catch (error) {
     console.error(error)
   } 
+};
+
+const communicateRead = (convoId,messages) => {
+  socket.emit("read", {
+      convoId,
+      messages
+  });
 };
