@@ -66,7 +66,7 @@ router.put("/read", async (req, res, next) => {
           user1Id: req.user.id,
           user2Id: req.user.id,
         },
-      }
+      },
     });
     if(conv !== null)
     {
@@ -75,10 +75,23 @@ router.put("/read", async (req, res, next) => {
           conversationId:conversation.id,
           senderId:userId,
   
-        }
+        },
       });
     }
-    res.json(200);
+    const updatedConv = await Conversation.findOne({
+      where: {
+        id:conversation.id
+      },
+      attributes: ["id"],
+      order: [[Message, "createdAt", "ASC"]],
+      include: [
+        { model: Message, order: ["createdAt", "DESC"] },
+      ],
+    });
+    const updatedmessages = updatedConv.toJSON().messages;
+    
+    
+    res.json(updatedmessages);
 
   }catch (error) {
     next(error);

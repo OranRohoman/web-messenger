@@ -12,6 +12,7 @@ export const addMessageToStore = (state, payload) => {
     };
     newConvo.lastTime = message.createdAt;
     newConvo.latestMessageText = message.text;
+    newConvo.lastread = "";
     newConvo.totalUnread = 1;
     // resort the conversations
     return [newConvo, ...state];
@@ -82,7 +83,9 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       newConvo.id = message.conversationId;
       newConvo.messages.push(message);
       newConvo.latestMessageText = message.text;
+      newConvo.lastread = ""
       newConvo.active = true;
+      newConvo.totalUnread =0;
       return newConvo;
     } else {
       convo.active = false;
@@ -96,12 +99,14 @@ export const updateRead = (state, conversation, userId) => {
     if(convo.id === conversation.id) {
       const newConvo = { ...convo}
       newConvo.active = true;
-      let read_count = 0;
-      newConvo.messages.forEach(element => {
-        if(element.senderId === userId) {
-          element.read = true;
+      const messages = newConvo.messages.map((message) => {
+        if(message.senderId === userId) {
+          const new_message = {...message, read:true}; 
+          return new_message;
         }
+        else{return message;}
       });
+      newConvo.messages = messages;
       newConvo.totalUnread = 0;
       return newConvo;
     }
@@ -110,4 +115,22 @@ export const updateRead = (state, conversation, userId) => {
       return convo;
     }
   });
-}
+};
+
+export const foreignRead = (state, conversation) => {
+  return state.map((convo) => {
+    if(convo.id === conversation.convoId) {
+      const newConvo = { ...convo, messages:conversation.messages};
+      newConvo.messages.forEach(message =>
+      {
+        if(message.senderId !== newConvo.otherUser.id && message.read){
+
+          newConvo.lastread = message;
+        }
+
+      });
+    
+      return newConvo;
+    }
+    else{return convo;}
+})};

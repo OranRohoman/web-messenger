@@ -32,22 +32,30 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     borderRadius: 10,
   },
+  bold:{
+    fontSize: 12,
+    fontWeight: "bold",
+    letterSpacing: -0.17,
+  }
 }));
 
 const ChatContent = (props) => {
   const classes = useStyles();
   const { conversation, unreadCount} = props;
   const { latestMessageText, otherUser } = conversation;
-
+ 
   return (
     <Box className={classes.root}>
       <Box>
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText}>
+        {unreadCount === 0 && <Typography className={classes.previewText}>
           {latestMessageText}
-        </Typography>
+        </Typography>}
+        {unreadCount > 0 && <Typography className={classes.bold}>
+          {latestMessageText}
+        </Typography>}
       </Box>
       {unreadCount > 0 && <Typography className={classes.notification}>{unreadCount}</Typography> }
     </Box>
