@@ -19,6 +19,7 @@ export const fetchUser = () => async (dispatch) => {
     const { data } = await axios.get("/auth/user");
     dispatch(gotUser(data));
     if (data.id) {
+      socket.connect();
       socket.emit("go-online", data.id);
     }
   } catch (error) {
@@ -32,8 +33,8 @@ export const register = (credentials) => async (dispatch) => {
   try {
     const { data } = await axios.post("/auth/register", credentials);
     dispatch(gotUser(data));
+    socket.connect();
     socket.emit("go-online", data.id);
-    localStorage.setItem("user",data.id);
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -44,8 +45,8 @@ export const login = (credentials) => async (dispatch) => {
   try {
     const { data } = await axios.post("/auth/login", credentials);
     dispatch(gotUser(data));
+    socket.connect();
     socket.emit("go-online", data.id);
-    localStorage.setItem("user",data.id);
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -112,16 +113,16 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const setRead = (conversation,userId) => async(dispatch) =>
+export const setRead = (conversation, otherId ) => async(dispatch) =>
 {
   try {
     //check if it isnt a new conversation
     if(conversation.id !== undefined)
     {
-      const credentials = {conversation,userId};
+      const credentials = {conversation,otherId};
       const messages = await axios.put(`/api/messages/read/`,credentials);
-      dispatch(markRead(conversation,userId));
-      communicateRead(conversation.id,messages.data)
+      dispatch(markRead(conversation,otherId));
+      communicateRead(conversation,messages.data)
     }
     
   } catch (error) {
@@ -129,9 +130,9 @@ export const setRead = (conversation,userId) => async(dispatch) =>
   } 
 };
 
-const communicateRead = (convoId,messages) => {
+const communicateRead = (conversation,messages) => {
   socket.emit("read", {
-      convoId,
-      messages
+      conversation,
+      messages,
   });
 };

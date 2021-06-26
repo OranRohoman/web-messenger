@@ -37,7 +37,7 @@ router.post("/", async (req, res, next) => {
         user1Id: senderId,
         user2Id: recipientId,
       });
-      if (onlineUsers.includes(sender.id)) {
+      if (onlineUsers.hasOwnProperty(sender.id)) {
         sender.online = true;
       }
     }
@@ -55,7 +55,7 @@ router.post("/", async (req, res, next) => {
 
 router.put("/read", async (req, res, next) => {
   try{
-    const { conversation,userId } = req.body;
+    const { conversation,otherId } = req.body;
     if (!req.user) {
       return res.sendStatus(401);
     }    
@@ -73,7 +73,7 @@ router.put("/read", async (req, res, next) => {
       await Message.update({read:true},{
         where:{
           conversationId:conversation.id,
-          senderId:userId,
+          senderId:otherId,
   
         },
       });

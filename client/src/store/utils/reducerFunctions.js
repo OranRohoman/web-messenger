@@ -3,7 +3,7 @@ export const addMessageToStore = (state, payload) => {
   // this is a messy temporary fix for a problem that will be solved in ticket 4.
   const user_id =  localStorage.getItem("user");
 
-  if (sender !== null && user_id == message.recipientId) {
+  if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
       otherUser: sender,
@@ -119,7 +119,7 @@ export const updateRead = (state, conversation, userId) => {
 
 export const foreignRead = (state, conversation) => {
   return state.map((convo) => {
-    if(convo.id === conversation.convoId) {
+    if(convo.id === conversation.conversation.id) {
       const newConvo = { ...convo, messages:conversation.messages};
       newConvo.messages.forEach(message =>
       {
@@ -129,7 +129,6 @@ export const foreignRead = (state, conversation) => {
         }
 
       });
-    
       return newConvo;
     }
     else{return convo;}
