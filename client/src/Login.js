@@ -1,20 +1,24 @@
 import React from "react";
-import { Redirect, useHistory } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import {
   Grid,
-  Box,
+  
   Typography,
   Button,
   FormControl,
   TextField,
+  InputAdornment,
 } from "@material-ui/core";
 import { login } from "./store/utils/thunkCreators";
+import AuthWrapper from "./components/Auth/AuthWrapper";
+import  useStyles  from "./components/Auth/SharedStyles";
+import './components/Auth/AuthWrapper.css';
 
 const Login = (props) => {
-  const history = useHistory();
+  
   const { user, login } = props;
-
+  const classes = useStyles();
   const handleLogin = async (event) => {
     event.preventDefault();
     const username = event.target.username.value;
@@ -26,42 +30,48 @@ const Login = (props) => {
   if (user.id) {
     return <Redirect to="/home" />;
   }
-
+  const forgotPassword= () =>{
+    alert("TODO implement a password forgot feature.");
+  }
   return (
-    <Grid container justify="center">
-      <Box>
-        <Grid container item>
-          <Typography>Need to register?</Typography>
-          <Button onClick={() => history.push("/register")}>Register</Button>
-        </Grid>
-        <form onSubmit={handleLogin}>
-          <Grid>
-            <Grid>
-              <FormControl margin="normal" required>
-                <TextField
-                  aria-label="username"
-                  label="Username"
-                  name="username"
-                  type="text"
-                />
-              </FormControl>
-            </Grid>
-            <FormControl margin="normal" required>
-              <TextField
-                label="password"
-                aria-label="password"
-                type="password"
-                name="password"
-              />
-            </FormControl>
-            <Grid>
-              <Button type="submit" variant="contained" size="large">
-                Login
-              </Button>
-            </Grid>
-          </Grid>
+    <Grid >
+      <AuthWrapper 
+       Buttontext={"Create Account"} 
+       GreyText={"Dont have an account?"}
+       RedirectPath={"/register"}>
+      
+      
+        <form onSubmit={handleLogin} className={classes.formContent}>
+          <Typography className={classes.header}>Welcome Back!</Typography>
+          <FormControl margin="normal" required>
+            <TextField
+              aria-label="username"
+              label="Username"
+              name="username"
+              type="text"
+            />
+          </FormControl>
+          <FormControl margin="normal" required>
+            <TextField
+              label="Password"
+              aria-label="password"
+              type="password"
+              name="password"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end" onClick={forgotPassword}>
+                        <span className="passwordForgot">Forgot?</span>
+                    </InputAdornment>
+                  )}}
+            />            
+          </FormControl>
+          
+          <Button type="submit" variant="contained" size="large" className={classes.submitButton}>
+              Login
+            </Button>
+        
         </form>
-      </Box>
+      </AuthWrapper>
     </Grid>
   );
 };
