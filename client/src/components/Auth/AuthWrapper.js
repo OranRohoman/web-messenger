@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
         display:"flex",
         flexDirection: 'column',
         alignItems: 'center',
-        //backgroundColor:"black",
+        
     },
     authHeader:{
         width:"90%",
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
         width: "100%",
         backgroundSize: "cover",
         backgroundRepeat: 'no-repeat',
-        //height:'100vh',
+        
         
         display:'flex',
         justifyContent: 'center',
@@ -87,7 +87,6 @@ const AuthWrapper = (props) => {
             <Grid 
             item  sm={3} md={5} 
             className={classes.image} 
-            //className='image' 
             style={{
                 backgroundImage: `linear-gradient(to bottom,rgb(58, 141, 255,0.85), rgb(134, 185, 255,0.85)), url(${bjImg})`,            
             }}
