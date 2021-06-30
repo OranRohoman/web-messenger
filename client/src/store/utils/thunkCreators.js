@@ -84,6 +84,8 @@ const sendMessage = (data, body) => {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
+    user:body.user,
+    other:body.otherUser,
   });
 };
 
@@ -96,7 +98,7 @@ export const postMessage = (body) => async (dispatch) => {
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message));
+      dispatch(setNewMessage(data.message,null,body.user,body.otherUser));
     }
     sendMessage(data, body);
   } catch (error) {
@@ -113,7 +115,7 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const setRead = (conversation, otherId ) => async(dispatch) =>
+export const setRead = (conversation, otherId, userId ) => async(dispatch) =>
 {
   try {
     //check if it isnt a new conversation
@@ -122,7 +124,7 @@ export const setRead = (conversation, otherId ) => async(dispatch) =>
       const credentials = {conversation,otherId};
       const messages = await axios.put(`/api/messages/read/`,credentials);
       dispatch(markRead(conversation,otherId));
-      communicateRead(conversation,messages.data)
+      communicateRead(conversation,messages.data, userId)
     }
     
   } catch (error) {
@@ -130,9 +132,10 @@ export const setRead = (conversation, otherId ) => async(dispatch) =>
   } 
 };
 
-const communicateRead = (conversation,messages) => {
+const communicateRead = (conversation,messages, user) => {
   socket.emit("read", {
       conversation,
       messages,
+      user
   });
 };

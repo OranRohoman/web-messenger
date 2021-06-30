@@ -20,7 +20,7 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", (data) => {
-    store.dispatch(setNewMessage(data.message, data.sender));
+    store.dispatch(setNewMessage(data.message, data.sender, data.user, data.otherUser));
   });
   socket.on("read", (data) => {
     store.dispatch(foreRead(data));

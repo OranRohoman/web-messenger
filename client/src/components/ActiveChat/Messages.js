@@ -15,7 +15,7 @@ const Messages = (props) => {
     if(messages[messages.length -1].senderId !== userId && !messages[messages.length -1].read)
     {
       // probably a little messy to call the same dispatch twice.
-      props.setRead(conversation,otherUser.id);
+      props.setRead(conversation,otherUser.id, userId);
     }
   }
     return (
@@ -36,8 +36,8 @@ const Messages = (props) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setRead : (conversation,userId) =>{
-      dispatch(setRead(conversation,userId))
+    setRead : (conversation,otherId,userId) =>{
+      dispatch(setRead(conversation,otherId,userId))
     }
   };
 };

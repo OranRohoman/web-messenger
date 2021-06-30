@@ -1,20 +1,25 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
+  const { message, sender, user, otherUser } = payload;
   // this is a messy temporary fix for a problem that will be solved in ticket 4.
-  const user_id =  localStorage.getItem("user");
-
+  
   if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
-      otherUser: sender,
+      otherUser,
       messages: [message],
-      
     };
+    
     newConvo.lastTime = message.createdAt;
     newConvo.latestMessageText = message.text;
     newConvo.lastread = "";
-    newConvo.totalUnread = 1;
-    // resort the conversations
+    if(message.recipientId !== otherUser.id)
+    {
+      newConvo.totalUnread = 1;
+    }
+    else{
+      newConvo.totalUnread = 0;
+    }
+      // resort the conversations
     return [newConvo, ...state];
   }
 
@@ -26,7 +31,10 @@ export const addMessageToStore = (state, payload) => {
       convoCopy.lastTime = message.createdAt;
       if(!convo.active )
       {
-        convoCopy.totalUnread ++;
+        if(message.recipientId !== otherUser.id)
+        {
+          convoCopy.totalUnread++;
+        }
       }
       return convoCopy;
     } else {
@@ -121,14 +129,20 @@ export const foreignRead = (state, conversation) => {
   return state.map((convo) => {
     if(convo.id === conversation.conversation.id) {
       const newConvo = { ...convo, messages:conversation.messages};
+      let count = 0;
       newConvo.messages.forEach(message =>
       {
         if(message.senderId !== newConvo.otherUser.id && message.read){
 
           newConvo.lastread = message;
         }
-
+        if(message.senderId === newConvo.otherUser.id && !message.read)
+        {
+          count ++;
+        }
+        
       });
+      newConvo.totalUnread = count;
       return newConvo;
     }
     else{return convo;}

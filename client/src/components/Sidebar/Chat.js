@@ -23,7 +23,7 @@ const styles = {
 class Chat extends Component {
   handleClick = async (conversation) => {
     await this.props.setActiveChat(conversation.otherUser.username);
-    this.props.setRead(conversation,conversation.otherUser.id);
+    this.props.setRead(conversation,conversation.otherUser.id,this.props.user);
   };
 
   render() {
@@ -51,8 +51,8 @@ const mapDispatchToProps = (dispatch) => {
     setActiveChat: (id) => {
       dispatch(setActiveChat(id));
     },
-    setRead : (conversation,username) =>{
-      dispatch(setRead(conversation,username))
+    setRead : (conversation,username,userId) =>{
+      dispatch(setRead(conversation,username,userId))
     }
   };
 };
