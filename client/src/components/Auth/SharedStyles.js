@@ -35,6 +35,12 @@ const useStyles = makeStyles((theme) => ({
   
   
   },
+  passwordForgot:{
+    color:'blue',
+    '&:hover':{
+      color:'darkblue',
+    },
+  },
 
   
 }));

@@ -13,7 +13,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import chatImg from '../../assets/chatImg.svg';
 import bjImg from '../../assets/bg-img.png';
 import { useHistory } from "react-router-dom";
-import './AuthWrapper.css';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -21,7 +20,58 @@ const useStyles = makeStyles((theme) => ({
         color:"#3A8DFF",
         padding:"12px 42px",
         textAlign:"center"
-      }
+    },
+    rightSide:{
+        display:"flex",
+        flexDirection: 'column',
+        alignItems: 'center',
+        //backgroundColor:"black",
+    },
+    authHeader:{
+        width:"90%",
+
+        display: 'inline-flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+        gap:'10%',
+        alignItems: 'center',
+        marginTop: '10%',
+        backgroundColor:"white",
+        [theme.breakpoints.down('sm')]:{
+            width:"90%",
+            height:"10%",
+            justifyContent:"center",
+            
+            
+        },
+    },
+    image:{
+        width: "100%",
+        backgroundSize: "cover",
+        backgroundRepeat: 'no-repeat',
+        //height:'100vh',
+        
+        display:'flex',
+        justifyContent: 'center',
+        flexDirection:'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        color: 'white',  
+    },
+    
+    greyText:{
+        color:'#B0B0B0',
+    },
+    formStyle:{
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        width:'100%',
+    },
+    chatImg:{
+        marginBottom:'30px',
+    },
+
     
 }));
 const AuthWrapper = (props) => {
@@ -36,28 +86,29 @@ const AuthWrapper = (props) => {
         <Hidden only="xs">
             <Grid 
             item  sm={3} md={5} 
-            className="image" 
+            className={classes.image} 
+            //className='image' 
             style={{
                 backgroundImage: `linear-gradient(to bottom,rgb(58, 141, 255,0.85), rgb(134, 185, 255,0.85)), url(${bjImg})`,            
             }}
             >
-            <img src={chatImg} className="chatImg" alt=""/>
-            <Typography variant="h5" className="text">
+            <img src={chatImg} className={classes.chatImg} alt=""/>
+            <Typography variant="h5" >
                 Converse With anyone
             </Typography>
-            <Typography variant="h5" className="text">
+            <Typography variant="h5" >
                 with any language
             </Typography>
             
             </Grid>
         </Hidden>
         <Grid 
-        className="rightSide"
+        className={classes.rightSide}
         container  
         item xs={12} sm={9} md={7} 
         >
-            <Grid className="authHeader">
-                <Typography className="greyText">{GreyText}</Typography>
+            <Grid className={classes.authHeader}>
+                <Typography className={classes.greyText}>{GreyText}</Typography>
                 <Button onClick={() => history.push(RedirectPath)}
                     variant="outlined"
                     component={Paper}
@@ -66,7 +117,7 @@ const AuthWrapper = (props) => {
                     className={classes.customButton}
                 >{Buttontext}</Button>
             </Grid>
-            <Grid className="formStyle">
+            <Grid className={classes.formStyle}>
                 
                 {props.children}
             </Grid>

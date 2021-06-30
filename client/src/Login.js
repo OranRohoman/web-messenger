@@ -13,7 +13,7 @@ import {
 import { login } from "./store/utils/thunkCreators";
 import AuthWrapper from "./components/Auth/AuthWrapper";
 import  useStyles  from "./components/Auth/SharedStyles";
-import './components/Auth/AuthWrapper.css';
+
 
 const Login = (props) => {
   
@@ -60,7 +60,7 @@ const Login = (props) => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end" onClick={forgotPassword}>
-                        <span className="passwordForgot">Forgot?</span>
+                        <span className={classes.passwordForgot}>Forgot?</span>
                     </InputAdornment>
                   )}}
             />            
