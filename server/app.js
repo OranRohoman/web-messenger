@@ -10,6 +10,7 @@ const { User } = require("./db/models");
 const cookieParser = require('cookie-parser')
 // create store for sessions to persist in database
 const sessionStore = new SequelizeStore({ db });
+const InstanceSecret = require("./InstanceSecrets");
 
 
 const { json, urlencoded } = express;
@@ -27,17 +28,26 @@ app.use(express.static(join(__dirname, "public")));
 app.use(function (req, res, next) {
   const token = req.cookies.token;
   if (token) {
-    jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
-      if (err) {
-        return next();
-      }
-      User.findOne({
-        where: { id: decoded.id },
-      }).then((user) => {
-        req.user = user;
-        return next();
+    
+    if(InstanceSecret.hasOwnProperty(token))
+    {
+      const noise = InstanceSecret[token];
+      jwt.verify(token, process.env.SESSION_SECRET + noise, (err, decoded) => {
+        if (err) {
+          return next();
+        }
+        User.findOne({
+          where: { id: decoded.id },
+        }).then((user) => {
+          req.user = user;
+          return next();
+        });
       });
-    });
+      
+    }
+    else{
+      return next();
+    }
   } else {
     return next();
   }

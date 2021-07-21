@@ -62,7 +62,7 @@ router.get("/", async (req, res, next) => {
       }
 
       // set property for online status of the other user
-      if (onlineUsers.includes(convoJSON.otherUser.id)) {
+      if (onlineUsers.hasOwnProperty(convoJSON.otherUser.id)) {
         convoJSON.otherUser.online = true;
       } else {
         convoJSON.otherUser.online = false;
@@ -71,8 +71,21 @@ router.get("/", async (req, res, next) => {
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length -1].text;
       //new field to sort by so conversations in the side bar are still ordered.
-      convoJSON.lastTime = convoJSON.messages[convoJSON.messages.length -1].createdAt;
       
+      convoJSON.lastTime = convoJSON.messages[convoJSON.messages.length -1].createdAt;
+      let count = 0;
+      convoJSON.lastread = "";
+      convoJSON.messages.forEach(element => {
+        if(element.senderId != req.user.id && !element.read){
+          count++;
+        }
+        else if(element.senderId === req.user.id && element.read){
+          convoJSON.lastread = element;
+        }
+
+      });
+            
+      convoJSON.totalUnread = count;
       conversations[i] = convoJSON;
     }
     

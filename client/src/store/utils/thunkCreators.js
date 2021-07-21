@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  markRead,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -18,6 +19,7 @@ export const fetchUser = () => async (dispatch) => {
     const { data } = await axios.get("/auth/user");
     dispatch(gotUser(data));
     if (data.id) {
+      socket.connect();
       socket.emit("go-online", data.id);
     }
   } catch (error) {
@@ -31,8 +33,8 @@ export const register = (credentials) => async (dispatch) => {
   try {
     const { data } = await axios.post("/auth/register", credentials);
     dispatch(gotUser(data));
+    socket.connect();
     socket.emit("go-online", data.id);
-    localStorage.setItem("user",data.id);
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -43,8 +45,8 @@ export const login = (credentials) => async (dispatch) => {
   try {
     const { data } = await axios.post("/auth/login", credentials);
     dispatch(gotUser(data));
+    socket.connect();
     socket.emit("go-online", data.id);
-    localStorage.setItem("user",data.id);
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -82,6 +84,8 @@ const sendMessage = (data, body) => {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
+    user:body.user,
+    other:body.otherUser,
   });
 };
 
@@ -94,7 +98,7 @@ export const postMessage = (body) => async (dispatch) => {
     if (!body.conversationId) {
       dispatch(addConversation(body.recipientId, data.message));
     } else {
-      dispatch(setNewMessage(data.message));
+      dispatch(setNewMessage(data.message,null,body.user,body.otherUser));
     }
     sendMessage(data, body);
   } catch (error) {
@@ -109,4 +113,29 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   } catch (error) {
     console.error(error);
   }
+};
+
+export const setRead = (conversation, otherId, userId ) => async(dispatch) =>
+{
+  try {
+    //check if it isnt a new conversation
+    if(conversation.id !== undefined)
+    {
+      const credentials = {conversation,otherId};
+      const messages = await axios.put(`/api/messages/read/`,credentials);
+      dispatch(markRead(conversation,otherId));
+      communicateRead(conversation,messages.data, userId)
+    }
+    
+  } catch (error) {
+    console.error(error)
+  } 
+};
+
+const communicateRead = (conversation,messages, user) => {
+  socket.emit("read", {
+      conversation,
+      messages,
+      user
+  });
 };

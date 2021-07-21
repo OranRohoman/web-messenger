@@ -4,6 +4,8 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
+  updateRead,
+  foreignRead,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -15,6 +17,9 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
+const MARK_READ = "MARK_READ";
+const FOREIGN_READ = "FOREIGN_READ";
+
 
 // ACTION CREATORS
 
@@ -25,10 +30,10 @@ export const gotConversations = (conversations) => {
   };
 };
 
-export const setNewMessage = (message, sender) => {
+export const setNewMessage = (message, sender, user, otherUser) => {
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null },
+    payload: { message, sender: sender || null , user, otherUser},
   };
 };
 
@@ -67,6 +72,21 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
+export const markRead = (conversation,userId) => {
+  return {
+    type: MARK_READ,
+    payload: { conversation, userId},
+  }
+}
+
+export const foreRead = (conversation) => {
+  return {
+    type:FOREIGN_READ,
+    payload:{conversation},
+  }
+}
+
+
 // REDUCER
 
 const reducer = (state = [], action) => {
@@ -91,6 +111,17 @@ const reducer = (state = [], action) => {
         action.payload.recipientId,
         action.payload.newMessage
       );
+    case MARK_READ:
+      return updateRead(
+        state,
+        action.payload.conversation,
+        action.payload.userId
+      )
+    case FOREIGN_READ:
+      return foreignRead(
+        state,
+        action.payload.conversation
+      )
     default:
       return state;
   }

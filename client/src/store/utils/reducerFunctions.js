@@ -1,16 +1,25 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
-  // if sender isn't null, that means the message needs to be put in a brand new convo
-  const user_id =  localStorage.getItem("user");
-
-  if (sender !== null && user_id == message.recipientId) {
+  const { message, sender, user, otherUser } = payload;
+  // this is a messy temporary fix for a problem that will be solved in ticket 4.
+  
+  if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
-      otherUser: sender,
+      otherUser,
       messages: [message],
     };
     
+    newConvo.lastTime = message.createdAt;
     newConvo.latestMessageText = message.text;
+    newConvo.lastread = "";
+    if(message.recipientId !== otherUser.id)
+    {
+      newConvo.totalUnread = 1;
+    }
+    else{
+      newConvo.totalUnread = 0;
+    }
+      // resort the conversations
     return [newConvo, ...state];
   }
 
@@ -19,7 +28,14 @@ export const addMessageToStore = (state, payload) => {
       const convoCopy = { ...convo };
       convoCopy.messages.push(message);
       convoCopy.latestMessageText = message.text;
-
+      convoCopy.lastTime = message.createdAt;
+      if(!convo.active )
+      {
+        if(message.recipientId !== otherUser.id)
+        {
+          convoCopy.totalUnread++;
+        }
+      }
       return convoCopy;
     } else {
       return convo;
@@ -75,9 +91,59 @@ export const addNewConvoToStore = (state, recipientId, message) => {
       newConvo.id = message.conversationId;
       newConvo.messages.push(message);
       newConvo.latestMessageText = message.text;
+      newConvo.lastread = ""
+      newConvo.active = true;
+      newConvo.totalUnread =0;
       return newConvo;
     } else {
+      convo.active = false;
       return convo;
     }
   });
 };
+
+export const updateRead = (state, conversation, userId) => {
+  return state.map((convo) => {
+    if(convo.id === conversation.id) {
+      const newConvo = { ...convo}
+      newConvo.active = true;
+      const messages = newConvo.messages.map((message) => {
+        if(message.senderId === userId) {
+          const new_message = {...message, read:true}; 
+          return new_message;
+        }
+        else{return message;}
+      });
+      newConvo.messages = messages;
+      newConvo.totalUnread = 0;
+      return newConvo;
+    }
+    else{
+      convo.active = false;
+      return convo;
+    }
+  });
+};
+
+export const foreignRead = (state, conversation) => {
+  return state.map((convo) => {
+    if(convo.id === conversation.conversation.id) {
+      const newConvo = { ...convo, messages:conversation.messages};
+      let count = 0;
+      newConvo.messages.forEach(message =>
+      {
+        if(message.senderId !== newConvo.otherUser.id && message.read){
+
+          newConvo.lastread = message;
+        }
+        if(message.senderId === newConvo.otherUser.id && !message.read)
+        {
+          count ++;
+        }
+        
+      });
+      newConvo.totalUnread = count;
+      return newConvo;
+    }
+    else{return convo;}
+})};

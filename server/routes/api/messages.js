@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
+const { Op } = require("sequelize");
 
 // expects {recipientId, text, conversationId } in body (conversationId will be null if no conversation exists yet)
 router.post("/", async (req, res, next) => {
@@ -17,8 +18,8 @@ router.post("/", async (req, res, next) => {
       let convPK = await Conversation.findByPk(conversationId);
       if(convPK.dataValues.user1Id == recipientId && convPK.dataValues.user2Id ==  senderId
         || convPK.dataValues.user1Id == senderId && convPK.dataValues.user2Id == recipientId ){
-
-          const message = await Message.create({ senderId, text, conversationId});
+          
+          const message = await Message.create({ senderId, text, conversationId, read:false});
           return res.json({ message, sender });
       }
       return res.sendStatus(401);
@@ -36,23 +37,66 @@ router.post("/", async (req, res, next) => {
         user1Id: senderId,
         user2Id: recipientId,
       });
-      if (onlineUsers.includes(sender.id)) {
+      if (onlineUsers.hasOwnProperty(sender.id)) {
         sender.online = true;
       }
     }
-    
-    {
-      const message = await Message.create({
-        senderId,
-        text,
-        conversationId: conversation.id,
-      });
-      res.json({ message, sender });
-    }
-    
+    const message = await Message.create({
+      senderId,
+      text,
+      conversationId: conversation.id,
+      read:false,
+    });
+    res.json({ message, sender });
   } catch (error) {
     next(error);
   }
+});
+
+router.put("/read", async (req, res, next) => {
+  try{
+    const { conversation,otherId } = req.body;
+    if (!req.user) {
+      return res.sendStatus(401);
+    }    
+ 
+    const conv = await Conversation.findOne({
+      where:{
+        [Op.or]: {
+          user1Id: req.user.id,
+          user2Id: req.user.id,
+        },
+      },
+    });
+    if(conv !== null)
+    {
+      await Message.update({read:true},{
+        where:{
+          conversationId:conversation.id,
+          senderId:otherId,
+  
+        },
+      });
+    }
+    const updatedConv = await Conversation.findOne({
+      where: {
+        id:conversation.id
+      },
+      attributes: ["id"],
+      order: [[Message, "createdAt", "ASC"]],
+      include: [
+        { model: Message, order: ["createdAt", "DESC"] },
+      ],
+    });
+    const updatedmessages = updatedConv.toJSON().messages;
+    
+    
+    res.json(updatedmessages);
+
+  }catch (error) {
+    next(error);
+  }
+  
 });
 
 module.exports = router;
